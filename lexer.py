@@ -26,5 +26,14 @@ Lexeme → TOKEN Pairing:
 
 Returns a list of Token objects from input string.
 '''
+from token import Token
+
 class Lexer:
-    pass
+    def __init__(self, inputString):
+        self.input_string = inputString
+        self.cursor_pos = 0
+        self.tokens = []
+    
+    # Helper function to raise error
+    def raiseError(self, message):
+        raise ValueError(f'{self.cursor_pos}: {message}')
