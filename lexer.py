@@ -22,8 +22,8 @@ Lexeme → TOKEN Pairing:
     1.   O-O   → CASTLE_KINGSIDE
     2.   O-O-O → CASTLE_QUEENSIDE
 8. End of File
-    EOF
-    
+    "" → EOF
+
 Returns a list of Token objects from input string.
 '''
 class Lexer:
