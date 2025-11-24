@@ -9,3 +9,6 @@ class Token:
     
     def getContent(self):
         return self.content
+    
+    def __repr__(self):
+        return f"({self.type}, {self.content})"
