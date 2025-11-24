@@ -1,8 +1,8 @@
 # Parser Class for Parsing using RDP and LL(1) Techniques
-
+# X next to thing denots finished
 # <move>		::= <castle> | <pawn_move> | <piece_move>
-# <castle>		::= "O-O" | "O-O-O"
-# <piece_move> 	::= <piece> <disambig> <capture> <square> <check>
+# <castle>X		::= "O-O" | "O-O-O"
+# <piece_move>X ::= <piece> <disambig> <capture> <square> <check>
 # <pawn_move> 	::= <square> <promotion> <check>
 # 			     | <file> <capture> <square> <promotion> <check>
 # <disambig> 	::= <file> | <rank> | <square> | ε
@@ -13,6 +13,36 @@
 # <file> 		::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h"
 # <rank> 		::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8"
 # <piece> 		::= "N" | "B" | "R" | "Q" | "K"
+
+'''
+Lexeme → TOKEN Pairing:
+1. Pieces :
+    1.   K → KING
+    2.   Q → QUEEN
+    3.   R → ROOK
+    4.   B → BISHOP
+    5.   N → KNIGHT
+2. File Letter :
+    a, b, c, d, e, f, g, h → FILE, used in `<square>` and `<disamb>`
+3. Rank Digits :
+    1, 2, 3, 4, 5, 6, 7, 8 → RANK, used in `<square>` and `<disamb>`
+3. Square:
+    SQUARE
+4. Capture :
+    1.   `x` → CAPTURE
+5. Check :
+    1.   `+` → CHECK
+    2.   `#` → CHECKMATE
+6. Promotion:
+    1.   `=` → PROMOTION_SYMBOL
+7. Castling:
+    1.   O-O   → CASTLE_KINGSIDE
+    2.   O-O-O → CASTLE_QUEENSIDE
+8. End of File
+    "" → EOF
+
+Returns a list of Token objects from input string.
+'''
 
 from token import Token
 
@@ -58,11 +88,28 @@ class Parser:
         raise SyntaxError(f"Expected CASTLE_KINGSIDE or CASTLE_QUEENSIDE, goit {current_token.type}")
     
     def parsePieceMove(self):
-        current_token = self.match("PIECE")
-
+        piece = self.match("PIECE")
         next = self.lookAhead()
-        # checking for disambig
-        if next.type in ["FILE", "RANK"]:
-            pass
 
+        disambig = None
+        # checking for disambig
+        if next.type in ["FILE", "RANK", "SQUARE"]:
+            disambig = self.match(next.type)
         
+        # checking for capture
+        capture = False
+        if self.lookAhead().type == "CAPTURE":
+            self.match("CAPTURE")
+            capture = True
+        
+        # checking for square
+        square = ""
+        if next.type == "SQUARE":
+            square = self.match("SQUARE")
+        
+        # checking for check/checkmate
+        check = None
+        if next.type in ["CHECK", "CHECKMATE"]:
+            check = self.match(next.type)
+        
+        return {"piece": piece.content, "disambig": disambig.content, "capture": capture, "square": square.content, "check": check.content}
