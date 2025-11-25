@@ -4,19 +4,21 @@ Parses Chess Notation to Natural Language
 
 Grammar is as follows:
 ```
-<move>		    ::= <castle> | <pawn_move> | <piece_move>
-<castle>	    ::= "O-O" | "O-O-O"
-<piece_move> 	::= <piece> <disambig> <capture> <square> <check>
-<pawn_move> 	::= <square> <promotion> <check>
-                  | <file> <capture> <square> <promotion> <check>
-<disambig> 	    ::= <file> | <rank> | <square | ε
-<capture> 	    ::= "x" | ε
-<promotion> 	::= "=" <piece> | ε
-<check>		    ::= "+" | "#" | ε
-<square>	    ::= <file> <rank>
-<file> 		    ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h"
-<rank> 		    ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8"
-<piece> 	    ::= "N" | "B" | "R" | "Q" | "K"
+<move>		        ::= <castle> | <pawn_move> | <piece_move>
+<castle>		    ::= "O-O" | "O-O-O"
+<piece_move> 	    ::= <piece> <disambig> <capture> <square> <check>
+<pawn_move>	        ::= <file> <pawn_move_tail>
+<pawn_move_tail>	::= <rank> <promotion> <check>
+                        | <capture> <square> <promotion> <check>
+<disambig>		    ::= <file> <disambig_tail> | <rank> | ε
+<disambig_tail>	    ::= <rank> | ε
+<capture> 		    ::= "x" | ε
+<promotion> 		::= "=" <piece> | ε
+<check>		        ::= "+" | "#" | ε
+<square>		    ::= <file> <rank>
+<file> 			    ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h"
+<rank> 		        ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8"
+<piece> 		    ::= "N" | "B" | "R" | "Q" | "K" 
 ```
 
 Example:
@@ -36,11 +38,9 @@ Lexeme → TOKEN Pairing:
 > 4.   B → BISHOP
 > 5.   N → KNIGHT
 2.   File Letter :
-> a, b, c, d, e, f, g, h → FILE <br>
-used in `<square>` and `<disamb>`
+> a, b, c, d, e, f, g, h → FILE, used in `<square>` and `<disamb>`
 3.   Rank Digits :
-> 1, 2, 3, 4, 5, 6, 7, 8 → RANK <br>
-used in `<square>` and `<disamb>`
+> 1, 2, 3, 4, 5, 6, 7, 8 → RANK, used in `<square>` and `<disamb>`
 4.   Capture :
 > 1.   `x` → CAPTURE
 5.   Check :
