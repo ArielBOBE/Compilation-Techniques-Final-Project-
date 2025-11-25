@@ -15,7 +15,7 @@ Lexeme → TOKEN Pairing:
     1.   `+` → CHECK
     2.   `#` → CHECKMATE
 7. Promotion:
-    1.   `=` → PROMOTION_SYMBOL
+    1.   `=` → PROMOTION
 8. Castling:
     1.   O-O   → CASTLE_KINGSIDE
     2.   O-O-O → CASTLE_QUEENSIDE
