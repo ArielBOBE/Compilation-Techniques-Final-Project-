@@ -51,6 +51,14 @@ class Parser:
         self.tokens = tokens
         self.cursor_pos = 0 # pointer
 
+
+    def raiseError(self, message):
+        current_token = self.lookahead()
+        token_info = f" at position {self.cursor_pos}"
+        if current_token != ("EOF", None):
+            token_info += f" (token: {current_token.type} = '{current_token.content}')"
+        raise SyntaxError(message + token_info)
+
     def getTokens(self):
         return self.tokens 
     
@@ -59,7 +67,7 @@ class Parser:
             return self.tokens[self.cursor_pos]
         else:
             return ("EOF", None)
-    
+        
     # if current token matches the expected type, move cursor up and return token
     def match(self, token_type):
         current_token = self.lookAhead()
@@ -67,14 +75,14 @@ class Parser:
         if current_token.type == token_type:
             self.cursor_pos += 1
             return current_token
-        raise SyntaxError(f"Expected {token_type}, got {current_token.type}")
+        self.raiseError(f"Expected {token_type}, got {current_token.type}")
 
     def parseMove(self):
         current_token = self.lookAhead()
 
         if current_token.type in ["CASTLE_KINGSIDE", "CASTLE_QUEENSIDE"]:
             return self.parseCastle()
-        if current_token.type == "PIECE":
+        elif current_token.type == "PIECE":
             return self.parsePieceMove()
 
     def parseCastle(self):
@@ -85,7 +93,7 @@ class Parser:
         elif current_token.content == "O-O-O":
             self.match("CASTLE_QUEENSIDE")
             return {"type": "castle", "side": "queen"}
-        raise SyntaxError(f"Expected CASTLE_KINGSIDE or CASTLE_QUEENSIDE, goit {current_token.type}")
+        self.raiseError(f"Expected CASTLE_KINGSIDE or CASTLE_QUEENSIDE, got {current_token.type}")
     
     def parsePieceMove(self):
         piece = self.match("PIECE")
