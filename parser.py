@@ -84,6 +84,10 @@ class Parser:
             return self.parseCastle()
         elif current_token.type == "PIECE":
             return self.parsePieceMove()
+        elif current_token.type in ["SQUARE", "FILE"]:
+            return self.parsePawnMove()
+        else:
+            self.raiseError(f"Unexpected token at start of move: {current_token.type}")
 
     def parseCastle(self):
         current_token = self.lookAhead()
@@ -121,3 +125,50 @@ class Parser:
             check = self.match(next.type)
         
         return {"piece": piece.content, "disambig": disambig.content, "capture": capture, "square": square.content, "check": check.content}
+    
+    def parsePawnMove(self):
+        next_token = self.lookAhead()
+
+        # takes into account pawn captures
+        file = None
+        capture = False
+
+        #regular pawn move
+        square = None
+        promotion = None
+        check = None
+
+        # pawn capture parsing
+        if next_token.type == "FILE":
+            file = self.match("FILE")
+            next_token = self.lookAhead()
+
+            if next_token.type == "CAPTURE":
+                self.match("CAPTURE")
+                capture = True
+                next_token = self.lookAhead()
+
+        # regular pawnw movement parsing
+        if next_token.type == "SQUARE":
+            square = self.match("SQUARE")
+            next_token = self.lookAhead()
+        else:
+            self.raiseError(f"Expected SQUARE in pawn move, got {next_token.type}")
+
+        if next_token.type == "PROMOTION_SYMBOL":
+            self.match("PROMOTION_SYMBOL")
+            promotion = self.match("PIECE") # promotion piece
+            next_token = self.lookAhead()
+
+        if next_token.type in ["CHECK", "CHECKMATE"]:
+            check = self.match(next_token.type)
+
+        return {
+            "type"      : "pawn_move",
+            "file"      : file.content if file else None,
+            "capture"   : capture,
+            "square"    : square.content if square else None,
+            "promotion" : promotion.content if promotion else None,
+            "check"     : check.content if check else None
+        }
+
