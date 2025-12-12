@@ -60,7 +60,16 @@ class Parser:
         raise SyntaxError(message + token_info)
 
     def getTokens(self):
-        return self.tokens 
+        return self.tokens
+    
+    def parse(self):
+        move = self.parseMove()
+
+        current_token = self.lookAhead()
+        if current_token.type != "EOF":
+            self.raiseError(f"Unexpected token after move, expected EOF")
+
+        return move
     
     def lookAhead(self):
         if self.cursor_pos < len(self.tokens): # looks ahead only if available
@@ -101,30 +110,77 @@ class Parser:
     
     def parsePieceMove(self):
         piece = self.match("PIECE")
-        next = self.lookAhead()
+        next_token = self.lookAhead()
 
         disambig = None
+        square = None
+
         # checking for disambig
-        if next.type in ["FILE", "RANK", "SQUARE"]:
-            disambig = self.match(next.type)
-        
-        # checking for capture
+        if next_token.type in ["FILE", "RANK"]:
+            disambig = self.match(next_token.type)
+            next_token = self.lookAhead()
+        elif next_token.type == "SQUARE":
+            # if the token is SQUARE, it could either be
+            # DISAMBIG or the final SQAURE
+            # checking if there's another square after capture to decide that
+            temp_pos = self.cursor_pos
+            first_square = self.match("SQUARE")
+            next_token = self.lookAhead()
+
+            # if there is capture after the square, meanss that this first_square is a disambig
+            if next_token.type == "CAPTURE":
+                disambig = first_square
+                self.match("CAPTURE")
+                next_token = self.lookAhead()
+                
+                # takes the actual destination square
+                if next_token.type() == "SQUARE":
+                    square = self.match("SQUARE")
+                    next_token = self.lookAhead()
+                else:
+                    self.raiseError(f"Expected destination SQUARE after capture")
+            else:
+                # if no capture, then the first_square is the destination
+                square = first_square
+
+        #  chechking for capture if not already handled above
         capture = False
-        if self.lookAhead().type == "CAPTURE":
+        # handles direct capture without anny disambig.. i.e. Nxe5
+        if not square and next_token.type == "CAPTURE":
             self.match("CAPTURE")
             capture = True
+            next_token = self.lookAhead()
+        # handles captures that follow after a file/rank disambig.. i.e. Nfxe5 or R4xd4
+        elif disambig and next_token.type == "CAPTURE":
+            self.match("CAPTURE")
+            capture = True
+            next_token = self.lookAhead()
+        else:
+            # if there was a disambig and it was a square, then it's a guaranteed capture
+            capture = (disambig is not None and disambig.type == "SQUARE") 
         
-        # checking for square
-        square = ""
-        if next.type == "SQUARE":
-            square = self.match("SQUARE")
+        # checking for square if not already matched
+        if not square:
+            if next_token.type == "SQUARE":
+                square = self.match("SQUARE")
+                next_token = self.lookAhead()
+            else:
+                self.raiseError(f"Expected SQUARE after piece move")
         
         # checking for check/checkmate
         check = None
-        if next.type in ["CHECK", "CHECKMATE"]:
-            check = self.match(next.type)
+        if next_token.type in ["CHECK", "CHECKMATE"]:
+            check = self.match(next_token.type)
         
-        return {"piece": piece.content, "disambig": disambig.content, "capture": capture, "square": square.content, "check": check.content}
+        return {
+            "type"      : "piece_move",
+            "piece"     : piece.content,
+            "disambig"  : disambig.content if disambig else None,
+            "capture"   : capture, 
+            "square"    : square.content,
+            "check"     : check.content if check else None
+
+        }
     
     def parsePawnMove(self):
         next_token = self.lookAhead()
@@ -143,6 +199,7 @@ class Parser:
             file = self.match("FILE")
             next_token = self.lookAhead()
 
+            # if the move starts with JUST a file, its guaranteed to be a capturing move
             if next_token.type == "CAPTURE":
                 self.match("CAPTURE")
                 capture = True
@@ -160,6 +217,7 @@ class Parser:
             promotion = self.match("PIECE") # promotion piece
             next_token = self.lookAhead()
 
+        # checks for checkmate or check
         if next_token.type in ["CHECK", "CHECKMATE"]:
             check = self.match(next_token.type)
 
@@ -167,7 +225,7 @@ class Parser:
             "type"      : "pawn_move",
             "file"      : file.content if file else None,
             "capture"   : capture,
-            "square"    : square.content if square else None,
+            "square"    : square.content,
             "promotion" : promotion.content if promotion else None,
             "check"     : check.content if check else None
         }
