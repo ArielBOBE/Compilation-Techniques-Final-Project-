@@ -167,7 +167,7 @@ class Parser:
                 self.raiseError(f"Expected SQUARE after piece move")
         
         # checking for check/checkmate
-        check = None
+        check = False
         checkmate = False
         if next_token.type == "CHECK":
             self.match("CHECK")
