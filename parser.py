@@ -223,7 +223,7 @@ class Parser:
             next_token = self.lookAhead()
 
         # checks for checkmate or check
-        check = None
+        check = False
         checkmate = False
         if next_token.type == "CHECK":
             self.match("CHECK")
