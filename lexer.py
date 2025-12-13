@@ -15,7 +15,7 @@ Lexeme → TOKEN Pairing:
     1.   `+` → CHECK
     2.   `#` → CHECKMATE
 7. Promotion:
-    1.   `=` → PROMOTION
+    1.   `=` → PROMOTION_SYMBOL
 8. Castling:
     1.   O-O   → CASTLE_KINGSIDE
     2.   O-O-O → CASTLE_QUEENSIDE
@@ -28,15 +28,15 @@ from token import Token
 
 class Lexer:
     def __init__(self, inputString):
-        self.input_string   = inputString
-        self.cursor_pos     = 0
-        self.tokens         = []
-        self.VALID_PIECES   = {'K', 'Q', 'B', 'N', 'R'}                 # set of valid piece characters
-        self.VALID_FILES    = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}  # set of valid piece characters
-        self.VALID_RANKS    = {'1', '2', '3', '4', '5', '6', '7', '8'}  # set of valid rank characters
-        self.CAPTURE        = {'x'}                                     # capture symbol
-        self.CHECK          = {'+', '#'}                                # set of check related symbols
-        self.PROMOTION      = {'='}                                     # promotion symbol
+        self.input_string       = inputString
+        self.cursor_pos         = 0
+        self.tokens             = []
+        self.VALID_PIECES       = {'K', 'Q', 'B', 'N', 'R'}                 # set of valid piece characters
+        self.VALID_FILES        = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}  # set of valid piece characters
+        self.VALID_RANKS        = {'1', '2', '3', '4', '5', '6', '7', '8'}  # set of valid rank characters
+        self.CAPTURE            = {'x'}                                     # capture symbol
+        self.CHECK              = {'+', '#'}                                # set of check related symbols
+        self.PROMOTION_SYMBOL   = {'='}                                     # promotion symbol
     
     # Helper function to raise error
     def raiseError(self, message):
@@ -103,8 +103,8 @@ class Lexer:
                 continue
 
             # Promotion
-            if char in self.PROMOTION:
-                self.tokens.append(Token('PROMOTION', char))
+            if char in self.PROMOTION_SYMBOL:
+                self.tokens.append(Token('PROMOTION_SYMBOL', char))
                 self.cursor_pos += 1
                 continue
 
