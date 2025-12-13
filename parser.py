@@ -167,9 +167,14 @@ class Parser:
                 self.raiseError(f"Expected SQUARE after piece move")
         
         # checking for check/checkmate
-        check = False
-        if next_token.type in ["CHECK", "CHECKMATE"]:
-            check = self.match(next_token.type)
+        check = None
+        checkmate = False
+        if next_token.type == "CHECK":
+            self.match("CHECK")
+            check = True
+        elif next_token.type == "CHECKMATE":
+            self.match("CHECKMATE")
+            checkmate = True
         
         return {
             "type"      : "piece_move",
@@ -177,7 +182,8 @@ class Parser:
             "disambig"  : disambig.content if disambig else None,
             "capture"   : capture, 
             "square"    : square.content,
-            "check"     : check.content if check else None
+            "check"     : check,
+            "checkmate" : checkmate
 
         }
     
@@ -217,8 +223,14 @@ class Parser:
             next_token = self.lookAhead()
 
         # checks for checkmate or check
-        if next_token.type in ["CHECK", "CHECKMATE"]:
-            check = self.match(next_token.type)
+        check = None
+        checkmate = False
+        if next_token.type == "CHECK":
+            self.match("CHECK")
+            check = True
+        elif next_token.type == "CHECKMATE":
+            self.match("CHECKMATE")
+            checkmate = True
 
         return {
             "type"      : "pawn_move",
@@ -226,6 +238,7 @@ class Parser:
             "capture"   : capture,
             "square"    : square.content,
             "promotion" : promotion.content if promotion else None,
-            "check"     : check.content if check else None
+            "check"     : check,
+            "checkmate" : checkmate
         }
 
