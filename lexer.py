@@ -32,7 +32,7 @@ class Lexer:
         self.cursor_pos         = 0
         self.tokens             = []
         self.VALID_PIECES       = {'K', 'Q', 'B', 'N', 'R'}                 # set of valid piece characters
-        self.VALID_FILES        = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}  # set of valid piece characters
+        self.VALID_FILES        = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}  # set of valid file characters
         self.VALID_RANKS        = {'1', '2', '3', '4', '5', '6', '7', '8'}  # set of valid rank characters
         self.CAPTURE            = {'x'}                                     # capture symbol
         self.CHECK              = {'+', '#'}                                # set of check related symbols
