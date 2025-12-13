@@ -126,20 +126,24 @@ class Parser:
             first_square = self.match("SQUARE")
             next_token = self.lookAhead()
 
-            # if there is capture after the square, meanss that this first_square is a disambig
             if next_token.type == "CAPTURE":
+                # handles cases where there is a disambig as the first square followed with capture.. i.e. Nc3xd5
                 disambig = first_square
                 self.match("CAPTURE")
                 next_token = self.lookAhead()
                 
-                # takes the actual destination square
                 if next_token.type == "SQUARE":
                     square = self.match("SQUARE")
                     next_token = self.lookAhead()
                 else:
                     self.raiseError(f"Expected destination SQUARE after capture")
+            elif next_token.type == "SQUARE":
+                # handles case where there is a square disambig wihout a capture after it.. i.e. Qh4e1
+                disambig = first_square
+                square = self.match("SQUARE")
+                next_token = self.lookAhead()
             else:
-                # if no capture, then the first_square is the destination
+                # handles case where first square is the destination.. i.e. Ne4
                 square = first_square
 
         #  chechking for capture if not already handled above
