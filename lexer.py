@@ -57,10 +57,11 @@ class Lexer:
                     if s[self.cursor_pos:self.cursor_pos+5] == 'O-O-O':
                         self.tokens.append(Token('CASTLE_QUEENSIDE','O-O-O' ))
                         self.cursor_pos += 5
+                        continue
                     else:
                         self.tokens.append(Token('CASTLE_KINGSIDE','O-O' ))
                         self.cursor_pos += 3
-
+                        continue
                 # If char is just 'O' alone, raise error
                 else:
                     self.raiseError("Found 'O' without following '-O' or '-O-O'.")
@@ -89,6 +90,11 @@ class Lexer:
                         self.tokens.append(Token('FILE', char))
                         self.cursor_pos += 1
                         continue
+                else:
+                    # FILE at end of string
+                    self.tokens.append(Token('FILE', char))
+                    self.cursor_pos += 1
+                    continue
 
             # Ranks
             if char in self.VALID_RANKS:
@@ -112,14 +118,18 @@ class Lexer:
             if char in self.CHECK:
                 if char == '+':
                     self.tokens.append(Token('CHECK', char))
-                if char == '#':
+                elif char == '#':
                     self.tokens.append(Token('CHECKMATE', char))
                 self.cursor_pos += 1
+                continue
 
             # Unhandled characters
             if char.isspace():
                 self.cursor_pos += 1 
                 continue
+            else:
+                # Invalid character
+                self.raiseError(f"Unrecognized character '{char}'")
 
         # End of File
         self.tokens.append(Token('EOF', ''))
