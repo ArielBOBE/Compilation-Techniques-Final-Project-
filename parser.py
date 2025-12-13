@@ -53,9 +53,9 @@ class Parser:
 
 
     def raiseError(self, message):
-        current_token = self.lookahead()
+        current_token = self.lookAhead()
         token_info = f" at position {self.cursor_pos}"
-        if current_token != ("EOF", None):
+        if current_token.type != "EOF":
             token_info += f" (token: {current_token.type} = '{current_token.content}')"
         raise SyntaxError(message + token_info)
 
@@ -75,7 +75,7 @@ class Parser:
         if self.cursor_pos < len(self.tokens): # looks ahead only if available
             return self.tokens[self.cursor_pos]
         else:
-            return ("EOF", None)
+            return Token("EOF", "")
         
     # if current token matches the expected type, move cursor up and return token
     def match(self, token_type):
@@ -123,7 +123,6 @@ class Parser:
             # if the token is SQUARE, it could either be
             # DISAMBIG or the final SQAURE
             # checking if there's another square after capture to decide that
-            temp_pos = self.cursor_pos
             first_square = self.match("SQUARE")
             next_token = self.lookAhead()
 
@@ -134,7 +133,7 @@ class Parser:
                 next_token = self.lookAhead()
                 
                 # takes the actual destination square
-                if next_token.type() == "SQUARE":
+                if next_token.type == "SQUARE":
                     square = self.match("SQUARE")
                     next_token = self.lookAhead()
                 else:
@@ -168,7 +167,7 @@ class Parser:
                 self.raiseError(f"Expected SQUARE after piece move")
         
         # checking for check/checkmate
-        check = None
+        check = False
         if next_token.type in ["CHECK", "CHECKMATE"]:
             check = self.match(next_token.type)
         
