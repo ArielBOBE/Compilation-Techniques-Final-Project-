@@ -1,9 +1,9 @@
 # Parser Class for Parsing using RDP and LL(1) Techniques
-# X next to thing denots finished
+# X next to thing denotes finished
 # <move>		::= <castle> | <pawn_move> | <piece_move>
-# <castle>X		::= "O-O" | "O-O-O"
+# <castle>X		::= ("O-O" | "O-O-O") <check>
 # <piece_move>X ::= <piece> <disambig> <capture> <square> <check>
-# <pawn_move> 	::= <square> <promotion> <check>
+# <pawn_move>X 	::= <square> <promotion> <check>
 # 			     | <file> <capture> <square> <promotion> <check>
 # <disambig> 	::= <file> | <rank> | <square> | ε
 # <capture> 	::= "x" | ε
@@ -100,13 +100,35 @@ class Parser:
 
     def parseCastle(self):
         current_token = self.lookAhead()
+        side = None
+        
         if current_token.content == "O-O":
-            self.match("CASTLE_KINGSIDE") # move cursor up 
-            return {"type": "castle", "side": "king"} 
+            self.match("CASTLE_KINGSIDE")
+            side = "king"
         elif current_token.content == "O-O-O":
             self.match("CASTLE_QUEENSIDE")
-            return {"type": "castle", "side": "queen"}
-        self.raiseError(f"Expected CASTLE_KINGSIDE or CASTLE_QUEENSIDE, got {current_token.type}")
+            side = "queen"
+        else:
+            self.raiseError(f"Expected CASTLE_KINGSIDE or CASTLE_QUEENSIDE, got {current_token.type}")
+        
+        # Check for check/checkmate after castling
+        next_token = self.lookAhead()
+        check = False
+        checkmate = False
+        
+        if next_token.type == "CHECK":
+            self.match("CHECK")
+            check = True
+        elif next_token.type == "CHECKMATE":
+            self.match("CHECKMATE")
+            checkmate = True
+        
+        return {
+            "type": "castle",
+            "side": side,
+            "check": check,
+            "checkmate": checkmate
+        }
     
     def parsePieceMove(self):
         piece = self.match("PIECE")
