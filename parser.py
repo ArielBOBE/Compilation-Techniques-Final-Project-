@@ -45,6 +45,7 @@ Returns a list of Token objects from input string.
 '''
 
 from token import Token
+from ast_nodes import CastleNode, PieceMoveNode, PawnMoveNode
 
 class Parser:
     def __init__(self, tokens):
@@ -123,12 +124,7 @@ class Parser:
             self.match("CHECKMATE")
             checkmate = True
         
-        return {
-            "type": "castle",
-            "side": side,
-            "check": check,
-            "checkmate": checkmate
-        }
+        return CastleNode(side=side, check=check, checkmate=checkmate)
     
     def parsePieceMove(self):
         piece = self.match("PIECE")
@@ -202,16 +198,14 @@ class Parser:
             self.match("CHECKMATE")
             checkmate = True
         
-        return {
-            "type"      : "piece_move",
-            "piece"     : piece.content,
-            "disambig"  : disambig.content if disambig else None,
-            "capture"   : capture, 
-            "square"    : square.content,
-            "check"     : check,
-            "checkmate" : checkmate
-
-        }
+        return PieceMoveNode(
+            piece=piece.content,
+            square=square.content,
+            disambig=disambig.content if disambig else None,
+            capture=capture,
+            check=check,
+            checkmate=checkmate
+        )
     
     def parsePawnMove(self):
         next_token = self.lookAhead()
@@ -230,7 +224,7 @@ class Parser:
             file = self.match("FILE")
             next_token = self.lookAhead()
 
-            # if the move starts with JUST a file, its guaranteed to be a capturing move
+            # if the move starts with JUST a file, it's guaranteed to be a capturing move
             if next_token.type == "CAPTURE":
                 self.match("CAPTURE")
                 capture = True
@@ -258,13 +252,11 @@ class Parser:
             self.match("CHECKMATE")
             checkmate = True
 
-        return {
-            "type"      : "pawn_move",
-            "file"      : file.content if file else None,
-            "capture"   : capture,
-            "square"    : square.content,
-            "promotion" : promotion.content if promotion else None,
-            "check"     : check,
-            "checkmate" : checkmate
-        }
-
+        return PawnMoveNode(
+            square=square.content,
+            file=file.content if file else None,
+            capture=capture,
+            promotion=promotion.content if promotion else None,
+            check=check,
+            checkmate=checkmate
+        )
