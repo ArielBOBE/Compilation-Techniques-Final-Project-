@@ -241,22 +241,27 @@ class ChessCompilerGUI:
     def compile_pgn(self):
         """Compile entire PGN file"""
         if not self.pgn_file:
+            self.pgn_output.config(state='normal')
             self.pgn_output.delete('1.0', tk.END)
             self.pgn_output.insert('1.0', "Select a file first")
+            self.pgn_output.config(state='disabled')
             return
         
         try:
             self.pgn_moves = self.parse_pgn_file(self.pgn_file)
             self.refresh_pgn_output()
         except Exception as e:
+            self.pgn_output.config(state='normal')
             self.pgn_output.delete('1.0', tk.END)
             self.pgn_output.insert('1.0', f"Error: {str(e)}")
+            self.pgn_output.config(state='disabled')
     
     def refresh_pgn_output(self):
         """Refresh PGN output based on selected mode"""
         if not self.pgn_moves:
             return
         
+        self.pgn_output.config(state='normal')
         self.pgn_output.delete('1.0', tk.END)
         mode = self.output_mode.get()
         
@@ -318,6 +323,7 @@ class ChessCompilerGUI:
             output.append(f"{move_number:<6} {white_move}")
         
         self.pgn_output.insert('1.0', '\n'.join(output))
+        self.pgn_output.config(state='disabled')
 
 def main():
     root = tk.Tk()
