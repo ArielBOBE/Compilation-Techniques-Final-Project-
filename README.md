@@ -1,6 +1,54 @@
 # **Chess Notation Compiler**
 
-Parses Chess Notation to Natural Language
+A compiler which translates Standard Algebraic Notation (SAN) chess moves into natural language. Made as a final project for Compilation Techniques course, demonstrating lexical analysis, syntax parsing, AST generation, and code generation.
+
+## **Features**
+
+- **Complete Compilation Pipeline**: Lexer → Parser → AST → Code Generator
+- **Interactive GUI**: 
+  - Single Move Compiler with complete compilation details
+  - PGN Game Compiler for batch processing with White/Black output
+- **Comprehensive Move Support**: Piece moves, pawn moves, castling, captures, promotions, checks, checkmates, and disambiguation
+
+## **Installation & Usage**
+
+### Prerequisites
+- Python 3.14 or higher
+- tkinter
+
+### Running the Application
+
+```bash
+python main.py
+```
+
+### Using the GUI
+
+**Single Move Compiler Page:**
+1. Enter a chess move in Standard Algebraic Notation like `Nf3`, `exd5`, `O-O`or `e8=Q+`.
+2. Click "Compile" to process the move
+3. Toggle between Simple/Verbose output modes
+4. Expand "Compilation Details" to view all 5 stages:
+   - Stage 1: Tokens (lexical analysis)
+   - Stage 2: Parse Tree
+   - Stage 3: Abstract Syntax Tree (AST)
+   - Stage 4: Output
+
+**PGN Game Compiler Page:**
+1. Click "Browse" to select a PGN text file
+2. View moves in a two-column format (White | Black)
+3. Toggle Simple/Verbose mode to adjust output detail
+
+### Example Inputs
+
+- `Nf3` - Knight moves to f3
+- `Qxe5+` - Queen captures on e5, check
+- `exd5` - e-pawn captures on d5
+- `O-O` - Kingside castling
+- `e8=Q#` - Pawn promotes to Queen on e8, checkmate
+- `Nbd7` - Knight from b-file moves to d7 (disambiguation)
+
+## **Grammar Specification**
 
 Grammar is as follows:
 ```
@@ -50,3 +98,42 @@ Lexeme → TOKEN Pairing:
 8. End of File
 > `EOF`
 
+---
+
+## **Project Structure**
+
+```
+├── main.py              # GUI application
+├── lexer.py             # Lexical analyzer (tokenization)
+├── parser.py            # Recursive descent parser
+├── ast_nodes.py         # AST node class definition and hierarchy
+├── code_gen.py          # Code generator (AST to natural language)
+├── token.py             # Token class definition
+├── test_files/          # Sample PGN files for testing
+│   ├── pgn_test1.txt
+│   ├── pgn_test2.txt
+│   └── pgn_test3.txt
+└── README.md
+```
+
+## **Architecture**
+
+The compiler follows a traditional multi-stage compiler pipeline:
+
+1. **Lexical Analysis** (`lexer.py`): Converts input string into tokens
+2. **Syntax Analysis** (`parser.py`): Builds parse tree using recursive descent parsing with LL(1) grammar
+3. **AST Generation** (`ast_nodes.py`): Creates abstract syntax tree with specialized node types (CastleNode, PieceMoveNode, PawnMoveNode)
+4. **Code Generation** (`code_gen.py`): Translates AST into natural language output
+
+### AST Node Hierarchy
+```
+ChessASTNode (base)
+└── MoveNode (abstract)
+    ├── CastleNode
+    ├── PieceMoveNode
+    └── PawnMoveNode
+```
+
+## **Testing**
+
+Sample PGN files are provided in `test_files/` directory for batch testing the compiler with full games.
