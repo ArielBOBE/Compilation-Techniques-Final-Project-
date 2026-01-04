@@ -74,9 +74,9 @@ class CodeGen:
         parts = []
         
         if node.side == "king":
-            parts.append("king castles on kingside")
+            parts.append("King castles on kingside")
         elif node.side == "queen":
-            parts.append("king castles on queenside")
+            parts.append("King castles on queenside")
         
         if node.checkmate:
             parts.append("resulting in checkmate")
@@ -89,7 +89,7 @@ class CodeGen:
         """Generate detailed description for piece moves"""
         parts = []
         
-        piece_name = self.piece_names.get(node.piece, node.piece).lower()
+        piece_name = self.piece_names.get(node.piece, node.piece)
         parts.append(f"{piece_name} moves to {node.square}")
         
         if node.disambig:
@@ -109,7 +109,7 @@ class CodeGen:
         """Generate detailed description for pawn moves"""
         parts = []
         
-        parts.append(f"pawn moves to {node.square}")
+        parts.append(f"Pawn moves to {node.square}")
         
         if node.file:
             parts.append(f"from {node.file}-file")
@@ -118,7 +118,7 @@ class CodeGen:
             parts.append("captures")
         
         if node.promotion:
-            piece_name = self.piece_names.get(node.promotion, node.promotion).lower()
+            piece_name = self.piece_names.get(node.promotion, node.promotion)
             parts.append(f"promotes to {piece_name}")
         
         if node.checkmate:
