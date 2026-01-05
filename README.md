@@ -119,9 +119,8 @@ Lexeme → TOKEN Pairing:
 The compiler follows a traditional multi-stage compiler pipeline:
 
 1. **Lexical Analysis** (`lexer.py`): Converts input string into tokens
-2. **Syntax Analysis** (`parser.py`): Builds parse tree using recursive descent parsing with LL(1) grammar
-3. **AST Generation** (`ast_nodes.py`): Creates abstract syntax tree with specialized node types (CastleNode, PieceMoveNode, PawnMoveNode)
-4. **Code Generation** (`code_gen.py`): Translates AST into natural language output
+2. **Syntax Analysis & AST Generation** (`parser.py`): Builds abstract syntax tree using recursive descent parsing with LL(1) grammar
+3. **Code Generation** (`code_gen.py`): Translates AST into natural language output
 
 ### AST Node Hierarchy
 ```
