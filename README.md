@@ -28,7 +28,7 @@ python main.py
 1. Enter a chess move in Standard Algebraic Notation like `Nf3`, `exd5`, `O-O`or `e8=Q+`.
 2. Click "Compile" to process the move
 3. Toggle between Simple/Verbose output modes
-4. Expand "Compilation Details" to view all 5 stages:
+4. Expand "Compilation Details" to view all 4 stages:
    - Stage 1: Tokens (lexical analysis)
    - Stage 2: Parse Tree
    - Stage 3: Abstract Syntax Tree (AST)
